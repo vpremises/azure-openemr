@@ -22,10 +22,10 @@ ansible-generate-hosts:
 	@set -a; . ./$(ENV_FILE); set +a; ./setup/ansible-generate-hosts.sh
 
 ansible-run-playbook-mariadb:
-	@set -a; . ./$(ENV_FILE); set +a; ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/mariadb.yml
+	@set -a; . ./$(ENV_FILE); set +a; ./setup/validate-host-settings.sh && ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/mariadb.yml
 
 ansible-run-playbook-emr:
-	@set -a; . ./$(ENV_FILE); set +a; ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/openemr.yml
+	@set -a; . ./$(ENV_FILE); set +a; ./setup/validate-host-settings.sh && ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/openemr.yml
 
 clean:
 	@rm -f -- $(ENV_FILE)

@@ -1,32 +1,11 @@
-#!/bin/bash
-
-set -e
-
-SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-TENANT_ID=$(az account show --query tenantId -o tsv)
-
-SSH_DIR=~/.ssh
-KEY_NAME=id_rsa
-mkdir -p "$SSH_DIR"
-
-if [ ! -f "$SSH_DIR/$KEY_NAME" ]; then
-  ssh-keygen -t rsa -b 4096 -f "$SSH_DIR/$KEY_NAME" -N ""
-  echo "✅ Generate SSH Key File: $SSH_DIR/$KEY_NAME"
-else
-  echo "ℹ️ Use the SSH Key exists: $SSH_DIR/$KEY_NAME"
-fi
-
-PUB_KEY_PATH="$(cd "$SSH_DIR" && pwd)/${KEY_NAME}.pub"
-PRI_KEY_PATH="$(cd "$SSH_DIR" && pwd)/${KEY_NAME}"
-PUBLIC_IP=$(curl -s https://api.ipify.org)
-
-sed \
-  -e "s|__SUBSCRIPTION_ID__|$SUBSCRIPTION_ID|" \
-  -e "s|__TENANT_ID__|$TENANT_ID|" \
-  -e "s|__ALLOWED_SSH_IPS__|'[\"$PUBLIC_IP\"]'|" \
-  -e "s|__SSH_PUBLIC_KEY_PATH__|$PUB_KEY_PATH|" \
-  -e "s|__SSH_PRIVATE_KEY_PATH__|$PRI_KEY_PATH|" \
-  .env.template > .env
-
-echo ".env generated:"
-cat .env
+#!/usr/bin/env bash
+set -euo pipefail
+# Prepare local registration data without calling cloud APIs, discovering public IPs, or generating keys.
+python3 - <<'PYTHON'
+import os
+from pathlib import Path
+fd = os.open(".env", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+with os.fdopen(fd, "w") as output:
+    output.write(Path(".env.template").read_text())
+print("Local registration template created. Set trusted host, credential and key-path values before use.")
+PYTHON

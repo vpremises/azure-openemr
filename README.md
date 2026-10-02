@@ -19,3 +19,5 @@ Migration verification checks source, licensing, shell syntax, inventory generat
 ## License
 
 GPL-3.0, preserving the existing repository license. OpenEMR and third-party components retain their respective license terms.
+
+Environment preparation only copies a private registration template and never calls Azure, discovers external addresses, generates SSH keys, or prints credentials. Database passwords are blank in the template; deployment requires unique registered values of at least 16 characters and refuses the former example defaults.
