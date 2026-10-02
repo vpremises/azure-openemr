@@ -1,23 +1,26 @@
-# OpenEMR host deployment example
+# azure-openemr
 
-An independently maintained vPremises example for configuring OpenEMR, MariaDB, PHP and Nginx on registered hosts. Upstream application source is obtained from `openemr/openemr`. This example remains separate from the NERP application and from patient/service data.
+Review an OpenEMR host deployment example and its separation from Azure resource provisioning.
 
-## Responsibility boundary
+## What you can do
 
-Azure resource creation, identities, networks and provider authorization belong to Zixcel. This package accepts the resulting host addresses as registered inputs. The retained `terraform/` files are historical reference inputs; the Makefile's cloud targets stop before any resource operation. See [RESPONSIBILITY.md](RESPONSIBILITY.md). No cloud resource provider is implemented or activated by this migration.
+- Configure the host-local deployment inputs.
+- Understand which Azure provisioning work must be delegated to the configured integration.
 
-## Operator setup
+## Current scope
 
-Install Ansible with `make install-deps` if needed. Create a trusted local `.env` using `make setup-env`, then register `MARIADB_PUBLIC_IP`, `MARIADB_PRIVATE_IP`, `EMR_PUBLIC_IP`, `EMR_PRIVATE_IP`, host-account names and the SSH key path. The environment and generated inventory are excluded from Git. `make show-env` shows setting names with values redacted.
+The example does not create Azure resources as part of local setup. Registered secrets, deployment validation and operational access are required before use.
 
-Generate inventory with `make ansible-generate-hosts`. Review the registered hosts and the playbooks before explicitly running `make emr`, which installs and configures services. Existing inventory files are not overwritten. Optional certificate issuance requires operator-supplied domain and contact settings. A source checkout or CI check never provisions infrastructure or deploys the example.
+Package distribution is not activated by this documentation. Use the checked-in source and the declared dependency versions; published availability must be verified separately.
 
-## Validation
+## Getting started
 
-Migration verification checks source, licensing, shell syntax, inventory generation using synthetic documentation addresses, and cloud-target refusal. Live Azure provisioning, SSH connections, OpenEMR installation and certificate issuance are not part of that verification.
+Start with the implementation and examples linked below. Review registered configuration and prerequisites before running a command that writes state or contacts a service.
 
-## License
+## Documentation and source
 
-GPL-3.0, preserving the existing repository license. OpenEMR and third-party components retain their respective license terms.
+[Interface reference](docs/interface-reference.md)
 
-Environment preparation only copies a private registration template and never calls Azure, discovers external addresses, generates SSH keys, or prints credentials. Database passwords are blank in the template; deployment requires unique registered values of at least 16 characters and refuses the former example defaults.
+[Usage guide](docs/getting-started.md)
+
+[Contributing](CONTRIBUTING.md) · [Security reporting](SECURITY.md) · [License](LICENSE) · [Attribution notices](NOTICE)
