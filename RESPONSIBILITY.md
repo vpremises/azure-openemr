@@ -1,0 +1,5 @@
+# Responsibility
+
+An OpenEMR deployment example maintained by vPremises. Host configuration, containers, web server, database, and application installation belong to vPremises. Azure resource creation, identities, network resources, and provider authorization belong to Zixcel; the legacy Terraform resources here are reference inputs pending that separation. OpenEMR and upstream code retain their licenses. NERP and medical service data are managed separately. Source migration does not provision cloud resources or deploy a service.
+
+The Makefile exposes host configuration only. Legacy cloud targets fail before any provider invocation. The retained `terraform/` files are reference inputs for a future Zixcel resource-provider implementation; no such provider is claimed to exist in this package. Host inventory is generated from explicitly registered public/private IP addresses and account/key-path settings, and is excluded from Git. Keep the registered `.env` file trusted, local, and private.

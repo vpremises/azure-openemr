@@ -1,77 +1,31 @@
-# Makefile for Terraform & Azure CLI environment
-
+# Host configuration belongs to vPremises. Resource provisioning belongs to Zixcel.
 ENV_FILE := .env
-ENV_TEMPLATE := .env.template
+.PHONY: emr setup-env install-deps show-env azure remove terraform-init terraform-plan terraform-estimate terraform-apply terraform-destroy ansible-generate-hosts ansible-run-playbook-mariadb ansible-run-playbook-emr clean
 
-.PHONY: azure emr install-deps setup-env terraform-init terraform-apply terraform-destroy clean show-env ansible-generate-hosts
-
-azure: install-deps setup-env terraform-init terraform-apply
 emr: ansible-generate-hosts ansible-run-playbook-mariadb ansible-run-playbook-emr
-remove: terraform-destroy clean
 
-# === 必要なパッケージのインストール ===
 install-deps:
-	@echo "Installing Azure CLI and Terraform if needed..."
 	./setup/install-ansible.sh
-	./setup/install-azurecli.sh
-	./setup/install-terraform.sh
-	./setup/install-infracost.sh
 
 setup-env:
-	@echo "Generating .env from template..."
-	@./setup/setup-envs.sh
+	./setup/setup-envs.sh
 
-# === .env を表示 ===
 show-env:
-	@echo "Current environment variables:"
-	@cat $(ENV_FILE)
+	@awk -F= '/^[A-Za-z_][A-Za-z0-9_]*=/{print $$1 "=<redacted>"}' $(ENV_FILE)
 
-# === Terraform 初期化 ===
-terraform-init:
-	@echo "Running terraform init..."
-	@export $$(grep -v '^#' $(ENV_FILE) | xargs) && \
-		terraform -chdir=terraform init 
-
-# === Terraform 初期化 ===
-terraform-plan:
-	@echo "Running terraform plan..."
-	@export $$(grep -v '^#' $(ENV_FILE) | xargs) && \
-		terraform -chdir=terraform plan
-
-terraform-estimate:
-	@echo "Running terraform plan..."
-	@infracost breakdown --path terraform
-
-# === Terraform 適用 ===
-terraform-apply:
-	@echo "Running terraform apply..."
-	@export $$(grep -v '^#' $(ENV_FILE) | xargs) && \
-		terraform -chdir=terraform apply -auto-approve
-
-
-# === Terraform 削除 ===
-terraform-destroy:
-	@echo "Running terraform destroy..."
-	@export $$(grep -v '^#' $(ENV_FILE) | xargs) && \
-		terraform -chdir=terraform destroy
-
+# The retained Terraform sources are reference inputs, not an active provisioning entry point.
+azure remove terraform-init terraform-plan terraform-estimate terraform-apply terraform-destroy:
+	@echo "Azure resource operations belong to Zixcel. Supply registered host addresses to vPremises."
+	@exit 2
 
 ansible-generate-hosts:
-	@echo "Generating HOSTS for ansible from Terraform outputs..."
-	@export $$(grep -v '^#' $(ENV_FILE) | xargs) && \
-		./setup/ansible-generate-hosts.sh
+	@set -a; . ./$(ENV_FILE); set +a; ./setup/ansible-generate-hosts.sh
 
 ansible-run-playbook-mariadb:
-	@echo "Running ansible playbook MariaDB..."
-	@export $$(grep -v '^#' $(ENV_FILE) | xargs) && \
-		ANSIBLE_ROLES_PATH=ansible/roles \
-		ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/mariadb.yml
+	@set -a; . ./$(ENV_FILE); set +a; ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/mariadb.yml
 
 ansible-run-playbook-emr:
-	@echo "Running ansible playbook EMR..."
-	@export $$(grep -v '^#' $(ENV_FILE) | xargs) && \
-		ANSIBLE_ROLES_PATH=ansible/roles \
-		ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/openemr.yml
+	@set -a; . ./$(ENV_FILE); set +a; ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/openemr.yml
 
 clean:
-	rm -f $(ENV_FILE)
+	@rm -f -- $(ENV_FILE)
