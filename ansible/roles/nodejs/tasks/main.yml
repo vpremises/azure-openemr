@@ -1,6 +1,24 @@
-- name: Install Node.js and npm (using NodeSource)
-  shell: |
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-    apt-get install -y nodejs
-  args:
-    executable: /bin/bash
+- name: Install keyring tools from signed distribution packages
+  ansible.builtin.apt:
+    name: [ca-certificates, gnupg]
+    state: present
+    update_cache: true
+
+- name: Download and verify NodeSource signing key
+  ansible.builtin.get_url:
+    url: "{{ nodejs_key_url }}"
+    dest: /usr/share/keyrings/nodesource.asc
+    checksum: "sha256:{{ nodejs_key_sha256 }}"
+    mode: '0644'
+
+- name: Configure the scoped NodeSource repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/nodesource.asc] {{ nodejs_repository }}/node_{{ nodejs_major }}.x nodistro main"
+    filename: nodesource
+    state: present
+
+- name: Install Node.js and npm from the authenticated repository
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: true
