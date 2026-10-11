@@ -27,6 +27,11 @@ server {
     location = /robots.txt  { log_not_found off; access_log off; }
     location ~ /\.          { deny all; }
 
+    # First matching regex wins: protect stored documents before static/PHP rules.
+    location ~* ^/sites/.*/(documents|edi|era) {
+        deny all;
+    }
+
     location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
         access_log off;
         log_not_found off;
@@ -38,10 +43,6 @@ server {
         if ($invalid_referer) {
             return 403;
         }
-    }
-
-    location ~* ^/sites/.*/(documents|edi|era) {
-        deny all;
     }
 
     {% raw %}
@@ -80,14 +81,15 @@ server {
     location = /robots.txt  { log_not_found off; access_log off; }
     location ~ /\.          { deny all; }
 
+    # First matching regex wins: protect stored documents before static/PHP rules.
+    location ~* ^/sites/.*/(documents|edi|era) {
+        deny all;
+    }
+
     location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
         access_log off;
         log_not_found off;
         expires max;
-    }
-
-    location ~* ^/sites/.*/(documents|edi|era) {
-        deny all;
     }
 
     {% raw %}
