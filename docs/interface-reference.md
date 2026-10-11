@@ -4,7 +4,7 @@ Use the [usage guide](getting-started.md) for the first steps. This reference pr
 
 ## Responsibility boundary
 
-Azure resource creation, identities, networks and provider authorization belong to Zixcel. This package accepts the resulting host addresses as registered inputs. The retained `terraform/` files are historical reference inputs; the Makefile's cloud targets stop before any resource operation. See [RESPONSIBILITY.md](../RESPONSIBILITY.md). No cloud resource provider is implemented or activated by this migration.
+Azure resource creation, identities, networks and provider authorization belong to Zixcel. This package accepts the resulting host addresses as registered inputs. The retained `reference/legacy-azure-terraform/` files are historical reference inputs; the Makefile's cloud targets stop before any resource operation. See [RESPONSIBILITY.md](../RESPONSIBILITY.md). No cloud resource provider is implemented or activated by this migration.
 
 ## Operator setup
 
