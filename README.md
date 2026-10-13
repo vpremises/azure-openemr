@@ -35,3 +35,5 @@ configured-domain HTTP entry redirects to HTTPS. Requires Jinja2, Docker,
 OpenSSL, curl, and an already available NGINX image. Set `NGINX_TEST_IMAGE`
 to an exact image digest for reproducible runs. Containers expose only ephemeral
 loopback ports and are removed after the checks.
+
+[OSS responsibility and source completion](docs/oss-source-contract.md) defines the supported package boundary and required acceptance. It does not declare unexecuted source, distribution or production checks complete.

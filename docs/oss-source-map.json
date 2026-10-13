@@ -1,0 +1,111 @@
+{
+  "repository": "vpremises/azure-openemr",
+  "purpose": "OpenEMR host deployment/configuration example, separated from Azure resource provisioning.",
+  "responsibility_boundary": "Host application configuration belongs here; Azure identity/resources/network and provider credentials belong to provider/environment owners. GPL-3.0 source is not relicensed as Apache-2.0.",
+  "packages": [],
+  "schema_definitions": [],
+  "test_sources": [
+    "tests/test_host_boundary.py",
+    "tests/test_nginx_protected_paths.py"
+  ],
+  "example_sources": [],
+  "workflow_definitions": [
+    {
+      "path": ".github/workflows/installers.yml",
+      "jobs": [
+        {
+          "job": "installer",
+          "condition": null,
+          "runs_on": "ubuntu-24.04",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": "Verify the official archive in isolated temporary storage",
+              "run": "bash -n setup/install-infracost.sh\ninstall -d \"$RUNNER_TEMP/reviewed-infracost\"\nINFRACOST_INSTALL_DIR=\"$RUNNER_TEMP/reviewed-infracost\" bash setup/install-infracost.sh\n\"$RUNNER_TEMP/reviewed-infracost/infracost\" --version\n",
+              "uses": null,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/oss-policy.yml",
+      "jobs": [
+        {
+          "job": "repository-policy",
+          "condition": null,
+          "runs_on": "ubuntu-latest",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": "Verify repository policy",
+              "run": "python3 .github/oss-policy-check.py",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Verify policy regression tests",
+              "run": "cd .github && python3 -m unittest discover -s policy-tests",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Check policy types",
+              "run": "python3 -m venv \"$RUNNER_TEMP/policy-types\"\n\"$RUNNER_TEMP/policy-types/bin/pip\" install -r .github/policy/requirements.txt\n\"$RUNNER_TEMP/policy-types/bin/mypy\" --strict .github/policy .github/oss-policy-check.py .github/policy-tests\n",
+              "uses": null,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/security-regression.yml",
+      "jobs": [
+        {
+          "job": "regression",
+          "condition": null,
+          "runs_on": "ubuntu-24.04",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": "Verify host-only entrypoints",
+              "run": "python3 tests/test_host_boundary.py",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Install template test dependency",
+              "run": "python3 -m pip install 'Jinja2==3.1.6'",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Check real NGINX HTTP and HTTPS protection",
+              "run": "docker pull nginx@sha256:0985e772fb9f729e6fa0980da05fca5d9c468e870eed43071545afa9d2e27d94\npython3 tests/test_nginx_protected_paths.py\n",
+              "uses": null,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "evidence_policy": "Declarations and source paths are not proof of an executed acceptance. Exact CI head and result are recorded separately. No live accounts or production acceptance is inferred."
+}
